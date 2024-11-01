@@ -6,6 +6,36 @@ use PHPUnit\Framework\TestCase;
 
 class GildedRoseTest extends TestCase
 {
+    private const FILE_PATH = __DIR__ . '/../PreRefactorData/snapshot_results.json';
+
+    public function test_updates_qualities_for_snapshotted_multiple_scenarios(): void
+    {
+        $savedResults = json_decode(file_get_contents(self::FILE_PATH), true);
+
+        foreach ($savedResults as $case) {
+            
+            $initial = $case['initial'];
+            $expected = $case['result'];
+
+            $item = new Item($initial['name'], $initial['sellIn'], $initial['quality']);
+            
+            $gildedRose = new GildedRose();
+            $gildedRose->updateQuality($item);
+
+            $this->assertEquals(
+                    $expected['sellIn'], 
+                    $item->sell_in, 
+                    "Fail ".$initial['name']." sellIn ".$initial['sellIn']." quality ".$initial['quality']
+            );
+            
+            $this->assertEquals(
+                    $expected['quality'], 
+                    $item->quality, 
+                    "Fail ".$initial['name']." sellIn ".$initial['sellIn']." quality ".$initial['quality']
+            );
+        }
+    }
+
     /**
      * @dataProvider itemsProvider
      * @param string $name
